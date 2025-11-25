@@ -1,0 +1,349 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --accent-primary: #3b82f6;
+  --accent-primary-light: #60a5fa;
+  --accent-primary-dark: #2563eb;
+  --accent-secondary: #8b5cf6;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-danger: #ef4444;
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --border-light: #e2e8f0;
+  --border-medium: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Dark mode theme */
+.dark {
+  --accent-primary: #60a5fa;
+  --accent-primary-light: #93c5fd;
+  --accent-primary-dark: #3b82f6;
+  --accent-secondary: #a78bfa;
+  --accent-success: #34d399;
+  --accent-warning: #fbbf24;
+  --accent-danger: #f87171;
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --border-light: #334155;
+  --border-medium: #475569;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Custom minimalist scrollbar */
+.custom-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Visible minimal scrollbar for main areas */
+.scroll-area {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-primary-light) transparent;
+}
+
+.scroll-area::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px 0;
+}
+
+.scroll-area::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--accent-primary-light), var(--accent-primary));
+  border-radius: 4px;
+  opacity: 0.6;
+}
+
+.scroll-area::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+
+/* Custom input styling */
+.input-field {
+  border-radius: 6px;
+  border: 1.5px solid var(--border-light);
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.input-field:hover {
+  border-color: var(--border-medium);
+}
+
+.input-field:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.input-field::placeholder {
+  color: var(--text-muted);
+}
+
+/* Grade input specific */
+.grade-input {
+  width: 64px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1.5px solid var(--accent-primary-light);
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+}
+
+.grade-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.dark .grade-input {
+  background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
+}
+
+/* Comment textarea */
+.comment-input {
+  resize: none;
+  min-height: 32px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-light);
+  padding: 6px 10px;
+  font-size: 13px;
+  line-height: 1.4;
+  background: var(--bg-secondary);
+}
+
+.comment-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.dark .comment-input {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-medium);
+}
+
+/* Card styles */
+.student-card {
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.student-card:hover {
+  border-color: var(--accent-primary-light);
+  background: linear-gradient(135deg, #fafbff 0%, #ffffff 100%);
+}
+
+.student-card.selected {
+  border-color: var(--accent-primary);
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2), var(--shadow-md);
+}
+
+.student-card.compact {
+  padding: 8px 12px;
+}
+
+/* Resizable divider */
+.resizable-divider {
+  width: 14px;
+  cursor: col-resize;
+  background: var(--bg-tertiary);
+  border-left: 1px solid var(--border-light);
+  border-right: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.resizable-divider:hover,
+.resizable-divider.dragging {
+  background: linear-gradient(180deg, var(--accent-primary-light) 0%, var(--accent-primary) 100%);
+}
+
+.resizable-divider:hover .divider-icon,
+.resizable-divider.dragging .divider-icon {
+  color: white;
+}
+
+.divider-icon {
+  color: var(--text-muted);
+  font-size: 18px;
+  transition: color 0.15s ease;
+  pointer-events: none;
+}
+
+/* Button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+  outline: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dark) 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--accent-primary-light) 0%, var(--accent-primary) 100%);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent-primary-light);
+  color: var(--accent-primary);
+  background: linear-gradient(135deg, #fafbff 0%, #ffffff 100%);
+}
+
+/* Status indicators */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-synced {
+  background: linear-gradient(135deg, var(--accent-success) 0%, #059669 100%);
+}
+
+.status-staged {
+  background: linear-gradient(135deg, var(--accent-warning) 0%, #d97706 100%);
+}
+
+/* Panel styling */
+.panel {
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.dark .panel {
+  background: var(--bg-secondary);
+  border-color: var(--border-light);
+}
+
+/* Dark mode for student cards */
+.dark .student-card {
+  background: var(--bg-secondary);
+  border-color: var(--border-light);
+}
+
+.dark .student-card:hover {
+  border-color: var(--accent-primary-light);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+}
+
+.dark .student-card.selected {
+  border-color: var(--accent-primary);
+  background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+}
+
+/* Accent text */
+.text-accent {
+  color: var(--accent-primary);
+}
+
+/* Material icon sizing */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+}
+
+.material-symbols-outlined.filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+}
+
+/* PDF Viewer styles */
+.react-pdf__Document {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.react-pdf__Page {
+  position: relative;
+  margin: 0 auto;
+}
+
+.react-pdf__Page canvas {
+  display: block;
+  border-radius: 4px;
+}
+
+.react-pdf__Page__textContent {
+  user-select: text;
+}
+
+.react-pdf__Page__annotations {
+  pointer-events: auto;
+}
