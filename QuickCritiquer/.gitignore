@@ -10,5 +10,6 @@ frontend/.env
 backend/config.json
 *.log
 *.tmp
-.vscode\
+.vscode\*
 node_modules\*
+dist\*
