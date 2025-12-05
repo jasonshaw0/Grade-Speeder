@@ -39,6 +39,7 @@ export interface StudentAttachment {
 
 export interface SubmissionComment {
   id: number;
+  authorId: number;
   authorName: string;
   comment: string;
   createdAt: string;
@@ -67,6 +68,22 @@ export interface StudentSubmission {
   grade?: string | null;
   attachments: StudentAttachment[];
   existingComments: SubmissionComment[];
+  rubricAssessments?: Record<string, { rating_id: string; comments: string; points: number }>;
+}
+
+export interface RubricRating {
+  id: string;
+  description: string;
+  long_description?: string;
+  points: number;
+}
+
+export interface RubricCriterion {
+  id: string;
+  description: string;
+  long_description?: string;
+  points: number;
+  ratings?: RubricRating[];
 }
 
 export interface SubmissionUpdate {
@@ -77,6 +94,8 @@ export interface SubmissionUpdate {
   newComment?: string | null;
   statusChanged?: boolean;
   newStatus?: SubmissionStatus;
+  rubricCommentsChanged?: boolean;
+  newRubricComments?: Record<string, string>;
 }
 
 export interface SyncResult {

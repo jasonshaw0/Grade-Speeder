@@ -5,7 +5,8 @@ interface Props {
   status: SubmissionStatus;
   secondsLate?: number | null;
   onChange?: (status: SubmissionStatus) => void;
-  size?: 'compact' | 'normal';
+  size?: 'compact' | 'normal' | 'small';
+  hideLateTime?: boolean;
 }
 
 const statusConfig: Record<SubmissionStatus, { label: string; color: string; bg: string; darkBg: string }> = {
@@ -15,7 +16,7 @@ const statusConfig: Record<SubmissionStatus, { label: string; color: string; bg:
   excused: { label: 'Excused', color: 'text-violet-700 dark:text-violet-400', bg: 'bg-violet-100', darkBg: 'dark:bg-violet-900/50' },
 };
 
-export function StatusDropdown({ status, secondsLate, onChange, size = 'normal' }: Props) {
+export function StatusDropdown({ status, secondsLate, onChange, size = 'normal', hideLateTime = false }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const config = statusConfig[status];
@@ -59,7 +60,7 @@ export function StatusDropdown({ status, secondsLate, onChange, size = 'normal' 
         className={`text-[10px] px-1.5 py-0.5 rounded font-medium flex items-center gap-1 ${config.bg} ${config.darkBg} ${config.color} ${onChange ? 'hover:opacity-80 cursor-pointer' : 'cursor-default'} transition`}
       >
         <span>{config.label}</span>
-        {status === 'late' && secondsLate && secondsLate > 0 && (
+        {!hideLateTime && status === 'late' && secondsLate && secondsLate > 0 && (
           <span className="opacity-75">[{formatLateTime(secondsLate)}]</span>
         )}
         {onChange && <span className="material-symbols-outlined text-[10px]">expand_more</span>}

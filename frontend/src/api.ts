@@ -64,7 +64,7 @@ export function createInitialDrafts(submissions: SubmissionsResponse['submission
     if (sub.excused) status = 'excused';
     else if (sub.missing) status = 'missing';
     else if (sub.late) status = 'late';
-    
+
     drafts[sub.userId] = {
       grade: sub.score ?? null,
       comment: '',
@@ -76,6 +76,10 @@ export function createInitialDrafts(submissions: SubmissionsResponse['submission
       status,
       baseStatus: status,
       statusDirty: false,
+      rubricComments: sub.rubricAssessments
+        ? Object.entries(sub.rubricAssessments).reduce((acc, [key, val]) => ({ ...acc, [key]: val.comments || '' }), {})
+        : {},
+      rubricCommentsDirty: false,
     };
   });
 

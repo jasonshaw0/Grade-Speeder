@@ -14,11 +14,10 @@ export function ViewerHeader({ studentName, groupName, activeTab, onTabChange }:
       <div className="flex items-center gap-2 flex-shrink-0">
         <button
           onClick={() => onTabChange('preview')}
-          className={`px-3 py-1.5 rounded-lg transition ${
-            activeTab === 'preview'
-              ? 'bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 dark:from-slate-700 dark:via-slate-600 dark:to-slate-700 text-slate-700 dark:text-slate-200 shadow-sm border border-slate-300 dark:border-slate-500'
-              : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border border-transparent'
-          }`}
+          className={`px-3 py-1.5 rounded-lg transition ${activeTab === 'preview'
+            ? 'bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 dark:from-slate-700 dark:via-slate-600 dark:to-slate-700 text-slate-700 dark:text-slate-200 shadow-sm border border-slate-300 dark:border-slate-500'
+            : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border border-transparent'
+            }`}
           title="Preview submission"
         >
           <div className="flex flex-row items-center gap-1">
@@ -28,16 +27,28 @@ export function ViewerHeader({ studentName, groupName, activeTab, onTabChange }:
         </button>
         <button
           onClick={() => onTabChange('details')}
-          className={`px-3 py-1.5 rounded-lg transition ${
-            activeTab === 'details'
-              ? 'bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 dark:from-slate-700 dark:via-slate-600 dark:to-slate-700 text-slate-700 dark:text-slate-200 shadow-sm border border-slate-300 dark:border-slate-500'
-              : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border border-transparent'
-          }`}
+          className={`px-3 py-1.5 rounded-lg transition ${activeTab === 'details'
+            ? 'bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 dark:from-slate-700 dark:via-slate-600 dark:to-slate-700 text-slate-700 dark:text-slate-200 shadow-sm border border-slate-300 dark:border-slate-500'
+            : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border border-transparent'
+            }`}
           title="Assignment details"
         >
           <div className="flex flex-row items-center gap-1">
             <span className="material-symbols-outlined text-[22px]">info</span>
             <span className="text-[11px] font-medium">Details</span>
+          </div>
+        </button>
+        <button
+          onClick={() => onTabChange('rubric')}
+          className={`px-3 py-1.5 rounded-lg transition ${activeTab === 'rubric'
+              ? 'bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 dark:from-slate-700 dark:via-slate-600 dark:to-slate-700 text-slate-700 dark:text-slate-200 shadow-sm border border-slate-300 dark:border-slate-500'
+              : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border border-transparent'
+            }`}
+          title="Rubric"
+        >
+          <div className="flex flex-row items-center gap-1">
+            <span className="material-symbols-outlined text-[22px]">fact_check</span>
+            <span className="text-[11px] font-medium">Rubric</span>
           </div>
         </button>
       </div>

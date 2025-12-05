@@ -31,7 +31,7 @@ router.get('/assignment-details', async (_req, res) => {
 router.get('/submissions', async (_req, res) => {
   try {
     const config = requireConfig();
-    const { submissions, assignmentName, courseName, courseCode, dueAt, pointsPossible, latePolicy, hasGroups } = await fetchSubmissions(config);
+    const { submissions, assignmentName, courseName, courseCode, dueAt, pointsPossible, latePolicy, hasGroups, rubric } = await fetchSubmissions(config);
     res.json({
       submissions,
       assignmentName,
@@ -43,6 +43,7 @@ router.get('/submissions', async (_req, res) => {
       pointsPossible,
       latePolicy,
       hasGroups,
+      rubric,
     });
   } catch (err: any) {
     log('warn', 'Failed to fetch submissions', { status: err?.response?.status });

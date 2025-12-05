@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { LatePolicy, PrivateConfig, StudentSubmission, SubmissionUpdate, SyncResult } from './types';
+import { LatePolicy, PrivateConfig, StudentSubmission, SubmissionUpdate, SyncResult, RubricCriterion } from './types';
 import { log } from './logger';
 import qs from 'qs';
 
@@ -54,7 +54,7 @@ async function fetchAllPages<T>(client: AxiosInstance, url: string, params?: Rec
 }
 
 function normalizeSubmission(
-  submission: any, 
+  submission: any,
   groupMap?: Record<number, { id: number; name: string }>,
   userToGroupMap?: Record<number, { groupId: number; groupName: string }>
 ): StudentSubmission {
@@ -79,10 +79,10 @@ function normalizeSubmission(
   // then fall back to userToGroupMap (for course-level groups)
   const submissionGroupId = submission.group?.id;
   const groupInfo = submissionGroupId && groupMap ? groupMap[submissionGroupId] : null;
-  
+
   // If no group from submission, check userToGroupMap
   const userGroupInfo = userToGroupMap ? userToGroupMap[submission.user_id] : null;
-  
+
   const finalGroupId = groupInfo?.id ?? userGroupInfo?.groupId ?? null;
   const finalGroupName = groupInfo?.name ?? submission.group?.name ?? userGroupInfo?.groupName ?? null;
 
@@ -103,15 +103,17 @@ function normalizeSubmission(
     attachments: normalizedAttachments,
     existingComments: comments.map((c: any) => ({
       id: c.id,
+      authorId: c.author_id || 0,
       authorName: c.author_name || 'Unknown',
       comment: c.comment || '',
       createdAt: c.created_at,
     })),
+    rubricAssessments: submission.rubric_assessment || {},
   };
 }
 
-export async function fetchSubmissions(config: PrivateConfig): Promise<{ 
-  submissions: StudentSubmission[]; 
+export async function fetchSubmissions(config: PrivateConfig): Promise<{
+  submissions: StudentSubmission[];
   assignmentName?: string;
   courseName?: string;
   courseCode?: string;
@@ -119,12 +121,13 @@ export async function fetchSubmissions(config: PrivateConfig): Promise<{
   pointsPossible?: number | null;
   latePolicy?: LatePolicy | null;
   hasGroups?: boolean;
+  rubric?: RubricCriterion[] | null;
 }> {
   const client = createClient(config);
   const path = `/courses/${config.courseId}/assignments/${config.assignmentId}/submissions`;
   const params = {
     per_page: 100,
-    include: ['user', 'submission_comments', 'group'],
+    include: ['user', 'submission_comments', 'group', 'rubric_assessment'],
     student_ids: ['all'],
   };
 
@@ -135,13 +138,15 @@ export async function fetchSubmissions(config: PrivateConfig): Promise<{
   let dueAt: string | null = null;
   let pointsPossible: number | null = null;
   let groupCategoryId: number | null = null;
-  
+  let rubric: RubricCriterion[] | null = null;
+
   try {
     const assignmentResp = await client.get(`/courses/${config.courseId}/assignments/${config.assignmentId}`);
     assignmentName = assignmentResp.data?.name;
     dueAt = assignmentResp.data?.due_at || null;
     pointsPossible = assignmentResp.data?.points_possible || null;
     groupCategoryId = assignmentResp.data?.group_category_id || null;
+    rubric = assignmentResp.data?.rubric || null;
   } catch (err) {
     log('debug', 'Could not fetch assignment details', {});
   }
@@ -173,17 +178,17 @@ export async function fetchSubmissions(config: PrivateConfig): Promise<{
   let groupMap: Record<number, { id: number; name: string }> = {};
   let userToGroupMap: Record<number, { groupId: number; groupName: string }> = {};
   let hasGroups = false;
-  
+
   try {
     // Use the direct /courses/:course_id/groups endpoint (includes users by default)
     const groups = await fetchAllPages<any>(client, `/courses/${config.courseId}/groups`, {
       per_page: 100,
       include: ['users'],
     });
-    
+
     for (const group of groups) {
       groupMap[group.id] = { id: group.id, name: group.name };
-      
+
       // Map each user in the group to their group
       if (group.users && Array.isArray(group.users)) {
         for (const user of group.users) {
@@ -191,7 +196,7 @@ export async function fetchSubmissions(config: PrivateConfig): Promise<{
         }
       }
     }
-    
+
     hasGroups = Object.keys(groupMap).length > 0;
   } catch (err) {
     log('debug', 'Could not fetch course groups', {});
@@ -199,7 +204,7 @@ export async function fetchSubmissions(config: PrivateConfig): Promise<{
 
   const normalized = submissions.map((s) => normalizeSubmission(s, groupMap, userToGroupMap));
 
-  return { submissions: normalized, assignmentName, courseName, courseCode, dueAt, pointsPossible, latePolicy, hasGroups };
+  return { submissions: normalized, assignmentName, courseName, courseCode, dueAt, pointsPossible, latePolicy, hasGroups, rubric };
 }
 
 export async function fetchFileStream(config: PrivateConfig, fileId: number) {
@@ -231,7 +236,7 @@ export async function pushSubmissionUpdates(config: PrivateConfig, updates: Subm
   const results: SyncResult[] = [];
 
   for (const update of updates) {
-    if (!update.gradeChanged && !update.commentChanged) {
+    if (!update.gradeChanged && !update.commentChanged && !update.rubricCommentsChanged) {
       results.push({ userId: update.userId, success: true });
       continue;
     }
@@ -242,6 +247,11 @@ export async function pushSubmissionUpdates(config: PrivateConfig, updates: Subm
     }
     if (update.commentChanged) {
       payload['comment[text_comment]'] = update.newComment ?? null;
+    }
+    if (update.rubricCommentsChanged && update.newRubricComments) {
+      Object.entries(update.newRubricComments).forEach(([criterionId, comment]) => {
+        payload[`rubric_assessment[${criterionId}][comments]`] = comment;
+      });
     }
 
     try {
@@ -277,7 +287,7 @@ export interface AssignmentInfo {
 
 export async function fetchAssignments(config: PrivateConfig): Promise<AssignmentInfo[]> {
   const client = createClient(config);
-  
+
   // Fetch all assignments
   const assignments = await fetchAllPages<any>(client, `/courses/${config.courseId}/assignments`, {
     per_page: 100,
@@ -291,7 +301,7 @@ export async function fetchAssignments(config: PrivateConfig): Promise<Assignmen
       per_page: 100,
       include: ['items'],
     });
-    
+
     for (const mod of modules) {
       if (mod.items) {
         for (const item of mod.items) {
@@ -307,11 +317,11 @@ export async function fetchAssignments(config: PrivateConfig): Promise<Assignmen
 
   // Fetch submission summaries for each assignment to get counts
   const assignmentsWithStats: AssignmentInfo[] = [];
-  
+
   for (const assignment of assignments) {
     let submissionCount = 0;
     let gradedCount = 0;
-    
+
     try {
       // Use submission_summary endpoint if available, otherwise estimate from assignment data
       const summaryResp = await client.get(`/courses/${config.courseId}/assignments/${assignment.id}/submission_summary`);
@@ -322,7 +332,7 @@ export async function fetchAssignments(config: PrivateConfig): Promise<Assignmen
       // Fallback - just use 0s
       log('debug', 'Could not fetch submission summary', { assignmentId: assignment.id });
     }
-    
+
     assignmentsWithStats.push({
       id: assignment.id,
       name: assignment.name,
@@ -366,10 +376,10 @@ export interface AssignmentDetails {
 
 export async function fetchAssignmentDetails(config: PrivateConfig): Promise<AssignmentDetails> {
   const client = createClient(config);
-  
+
   const response = await client.get(`/courses/${config.courseId}/assignments/${config.assignmentId}`);
   const assignment = response.data;
-  
+
   return {
     id: assignment.id,
     name: assignment.name,
