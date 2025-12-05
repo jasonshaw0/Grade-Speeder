@@ -17,7 +17,7 @@ backend/config.json
 *.tmp
 
 # IDE
-.vscode/
+.vscode
 
 # OS
 .DS_Store
